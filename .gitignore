@@ -1,0 +1,7 @@
+# Folders
+node_modules/
+
+# Files
+pnpm-lock.yaml
+yarn-lock.yaml
+package-lock.json
