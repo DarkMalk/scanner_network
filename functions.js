@@ -34,5 +34,5 @@ export function generateIPs(ipSegment, netmask) {
  * @param {string} ip
  */
 export async function pingIP(ip) {
-  return execAsync(`ping -c 1 ${ip} -W 1000`)
+  return execAsync(`ping -c 1 ${ip} -W 100`)
 }
