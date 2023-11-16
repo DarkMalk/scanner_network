@@ -1,0 +1,19 @@
+{
+  "name": "scanner_red",
+  "version": "1.0.0",
+  "description": "",
+  "main": "scanner_red.js",
+  "type": "module",
+  "scripts": {
+    "start": "node scanner_red.js"
+  },
+  "author": "DarkMalk",
+  "license": "ISC",
+  "dependencies": {
+    "@clack/prompts": "^0.7.0",
+    "picocolors": "^1.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.53.0"
+  }
+}
