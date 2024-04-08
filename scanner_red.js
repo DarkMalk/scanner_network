@@ -41,15 +41,14 @@ const IPsAvailable = []
 const sp = spinner()
 
 sp.start(messages.spinner.start)
-for (let ip of IPs) {
-  try {
-    const { error } = await pingIP(ip)
-    if (error) continue
-    IPsAvailable.push(ip)
-  } catch (error) {
-    continue
-  }
-}
+
+await Promise.all(IPs.map(pingIP)).then(array => {
+  array.forEach(result => {
+    if (!result?.stdout) return
+    IPsAvailable.push(result.ip)
+  })
+})
+
 sp.stop(messages.spinner.end)
 
 console.table(IPsAvailable)
