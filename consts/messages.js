@@ -2,7 +2,9 @@ import colors from 'picocolors'
 
 export const messages = {
   // eslint-disable-next-line quotes
-  intro: `${colors.bgWhite(" Scan active PC's in network ")}${colors.bgCyan(' @DarkMalk ')}`,
+  intro: `${colors.bgWhite(colors.black(" Scan active PC's in network "))}${colors.bgCyan(
+    colors.black(' @DarkMalk ')
+  )}`,
   segmentIp: {
     message: `${colors.cyan('Insert IP segment')}`,
     placeholder: '192.168.1.0',
