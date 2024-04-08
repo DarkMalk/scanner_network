@@ -1,6 +1,7 @@
 import { intro, text, isCancel, cancel, spinner } from '@clack/prompts'
 import { messages } from './consts/messages.js'
 import { generateIPs, pingIP } from './functions.js'
+import { regValidateIPv4, regValidateNetmask } from './consts/regex.js'
 
 intro(messages.intro)
 
@@ -8,8 +9,7 @@ const segmentIp = await text({
   message: messages.segmentIp.message,
   placeholder: messages.segmentIp.placeholder,
   validate: value => {
-    let reg = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
-    if (!reg.test(value)) {
+    if (!regValidateIPv4.test(value)) {
       return messages.segmentIp.validateMessage
     }
   }
@@ -24,8 +24,7 @@ const netmask = await text({
   message: messages.netmask.message,
   placeholder: messages.netmask.placeholder,
   validate: value => {
-    let reg = /^(0|([1-9]|[1-2][0-9]|3[0-2]))$/
-    if (!reg.test(value)) {
+    if (!regValidateNetmask.test(value)) {
       return messages.netmask.validateMessage
     }
   }
