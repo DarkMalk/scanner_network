@@ -1,19 +1,21 @@
 {
   "name": "scanner_red",
   "version": "1.0.0",
-  "description": "",
+  "description": "Network Tool for scanning your local network",
   "main": "scanner_red.js",
   "type": "module",
   "scripts": {
-    "start": "node scanner_red.js"
+    "start": "node scanner_red.js",
+    "commit": "commit-easy"
   },
   "author": "DarkMalk",
   "license": "ISC",
   "dependencies": {
-    "@clack/prompts": "^0.7.0",
-    "picocolors": "^1.0.0"
+    "@clack/prompts": "0.7.0",
+    "picocolors": "1.0.0"
   },
   "devDependencies": {
-    "eslint": "^8.53.0"
+    "commit-easy": "1.0.4",
+    "eslint": "8.53.0"
   }
 }
