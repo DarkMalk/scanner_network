@@ -1,4 +1,4 @@
-import { intro, text, isCancel, cancel, spinner } from '@clack/prompts'
+import { intro, text, isCancel, cancel, spinner, note, outro } from '@clack/prompts'
 import { messages } from './consts/messages.js'
 import { generateIPs, pingIP } from './functions.js'
 import { regValidateNetmask } from './consts/regex.js'
@@ -52,4 +52,6 @@ await Promise.all(IPs.map(pingIP)).then(array => {
 
 sp.stop(messages.spinner.end)
 
-console.table(IPsAvailable)
+note(messages.note.content(IPsAvailable), messages.note.title)
+
+outro(messages.outro)
