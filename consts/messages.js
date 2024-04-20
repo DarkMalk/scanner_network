@@ -19,5 +19,10 @@ export const messages = {
   spinner: {
     start: `${colors.cyan('Scanning network')}`,
     end: `${colors.cyan('Finalice scanning')}`
-  }
+  },
+  note: {
+    title: `${colors.cyan('IPs Available')}`,
+    content: IPs => IPs.join('\n')
+  },
+  outro: `${colors.bgWhite(colors.black(' Thanks for using '))}`
 }
