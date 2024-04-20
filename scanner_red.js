@@ -1,7 +1,8 @@
 import { intro, text, isCancel, cancel, spinner } from '@clack/prompts'
 import { messages } from './consts/messages.js'
 import { generateIPs, pingIP } from './functions.js'
-import { regValidateIPv4, regValidateNetmask } from './consts/regex.js'
+import { regValidateNetmask } from './consts/regex.js'
+import { isIPv4 } from 'node:net'
 
 intro(messages.intro)
 
@@ -9,7 +10,7 @@ const segmentIp = await text({
   message: messages.segmentIp.message,
   placeholder: messages.segmentIp.placeholder,
   validate: value => {
-    if (!regValidateIPv4.test(value)) {
+    if (!isIPv4(value)) {
       return messages.segmentIp.validateMessage
     }
   }
