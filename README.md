@@ -1,5 +1,9 @@
 # Network Scanner CLI App
 
+## preview
+
+![scanner-network-preview](./preview/scanner_network.webp)
+
 ## Overview
 
 This is a command-line interface (CLI) application designed to scan networks by providing an IP segment and netmask as inputs. With this tool, users can swiftly scan their network to identify active hosts, helping with network management.
