@@ -1,7 +1,6 @@
 import colors from 'picocolors'
 
 export const messages = {
-  // eslint-disable-next-line quotes
   intro: `${colors.bgWhite(colors.black(" Scan active PC's in network "))}${colors.bgCyan(
     colors.black(' @DarkMalk ')
   )}`,
