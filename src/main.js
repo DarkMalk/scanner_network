@@ -1,6 +1,7 @@
 import { intro, text, isCancel, cancel, spinner, note, outro } from '@clack/prompts'
 import { messages } from './consts/messages.js'
-import { generateIPs, pingIP } from './functions.js'
+import { pingIP } from './services/ping.js'
+import { generateIPs } from './services/generate-ips.js'
 import { regValidateNetmask } from './consts/regex.js'
 import { isIPv4 } from 'node:net'
 
