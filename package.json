@@ -2,11 +2,15 @@
   "name": "scanner_red",
   "version": "1.0.0",
   "description": "Network Tool for scanning your local network",
-  "main": "scanner_red.js",
+  "main": "src/main.js",
   "type": "module",
   "scripts": {
-    "start": "node scanner_red.js",
-    "commit": "commit-easy"
+    "start": "node src/main.js",
+    "commit": "commit-easy",
+    "lint:fix": "eslint --fix",
+    "lint:check": "eslint",
+    "format:check": "prettier . --check",
+    "format:fix": "prettier . --write"
   },
   "author": "DarkMalk",
   "license": "ISC",
@@ -15,7 +19,12 @@
     "picocolors": "1.0.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "commit-easy": "1.0.4",
-    "eslint": "8.53.0"
+    "eslint": "^10.6.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.6",
+    "globals": "^17.7.0",
+    "prettier": "^3.9.4"
   }
 }
