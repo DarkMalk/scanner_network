@@ -2,7 +2,7 @@
 
 ## preview
 
-![scanner-network-preview](./preview/scanner_network.webp)
+![scanner-network-preview](https://github.com/DarkMalk/scanner_network/blob/master/preview/scanner_network.webp?raw=true)
 
 ## Overview
 
@@ -44,9 +44,3 @@ When prompted, enter the following information:
 
 - **IP Segment:** Provide the IP segment you want to scan. For example: `192.168.1.0`
 - **Netmask:** Enter the netmask for the provided IP segment. For example: `24`
-
-## Example Usage
-
-https://github.com/DarkMalk/scanner_network/assets/82101078/6115b554-023c-45bd-861e-ed4a852e947c
-
-
