@@ -1,8 +1,3 @@
-import { exec } from 'node:child_process'
-import { promisify } from 'node:util'
-
-const execAsync = promisify(exec)
-
 /**
  *
  * @param {string} ipSegment
@@ -27,17 +22,4 @@ export function generateIPs(ipSegment, netmask) {
     lastSegmentIp++
   }
   return IPs
-}
-
-/**
- *
- * @param {string} ip
- */
-export async function pingIP(ip) {
-  try {
-    const { stdout } = await execAsync(`ping -c 1 ${ip}`)
-    return { stdout, ip }
-  } catch (e) {
-    return
-  }
 }
