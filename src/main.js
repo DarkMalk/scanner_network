@@ -2,8 +2,8 @@ import { intro, text, isCancel, cancel, spinner, note, outro } from '@clack/prom
 import { messages } from './consts/messages.js'
 import { pingIP } from './services/ping.js'
 import { generateIPs } from './services/generate-ips.js'
-import { regValidateNetmask } from './consts/regex.js'
 import { isIPv4 } from 'node:net'
+import { MAX_NETMASK, MIN_NETMASK } from './consts/netmask.js'
 
 intro(messages.intro)
 
@@ -26,7 +26,7 @@ const netmask = await text({
   message: messages.netmask.message,
   placeholder: messages.netmask.placeholder,
   validate: value => {
-    if (!regValidateNetmask.test(value)) {
+    if (isNaN(value) || Number(value) < MIN_NETMASK || Number(value) > MAX_NETMASK) {
       return messages.netmask.validateMessage
     }
   }

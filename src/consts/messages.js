@@ -12,7 +12,7 @@ export const messages = {
   netmask: {
     message: `${colors.cyan('Insert Netmask')}`,
     placeholder: '24',
-    validateMessage: 'Please insert netmask in range 0-32'
+    validateMessage: 'Please insert netmask in range 1-32'
   },
   canceled: 'Operation Canceled',
   spinner: {
