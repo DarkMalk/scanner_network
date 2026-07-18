@@ -1,0 +1,4 @@
+const MIN_NETMASK = 1
+const MAX_NETMASK = 32
+
+export { MIN_NETMASK, MAX_NETMASK }
