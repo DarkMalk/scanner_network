@@ -7,9 +7,10 @@ const execAsync = promisify(exec)
  *
  * @param {string} ip
  */
-export async function pingIP(ip) {
+export async function pingIP(ip, timeout = 100) {
   const { platform } = process
-  const command = platform === 'win32' ? `ping -n 1 -w 100 ${ip}` : `ping -c 1 -t 100 ${ip}`
+  const command =
+    platform === 'win32' ? `ping -n 1 -w ${timeout} ${ip}` : `ping -c 1 -W ${timeout} ${ip}`
 
   try {
     const { stdout } = await execAsync(command)
