@@ -5,23 +5,28 @@ import { generateSegmentIp } from './generate-segment-ip.js'
  * @param {string} segmentIp - La dirección IP del segmento.
  * @param {string} netmask - La máscara de red.
  * @param {number} [batchSize=254] - Tamaño del lote de IPs a generar.
- * @returns {Generator<string[]>}
+ * @returns {{ totalHosts: number, generateBatch: Generator<string[]> }}
  */
-export function* generateIPs(segmentIp, netmask, batchSize = 254) {
+export function generateIPs(segmentIp, netmask, batchSize = 254) {
   const totalHosts = Math.pow(2, 32 - Number(netmask)) - 2 // total de IPs disponibles
   const segment = generateSegmentIp(segmentIp, netmask)
-  let batch = []
 
-  for (let i = 1; i <= totalHosts; i++) {
-    batch.push(generateIpFromOffset(segment, i))
-    if (batch.length === batchSize) {
+  function* generateBatch() {
+    let batch = []
+
+    for (let i = 1; i <= totalHosts; i++) {
+      batch.push(generateIpFromOffset(segment, i))
+      if (batch.length === batchSize) {
+        yield batch
+        batch = []
+      }
+    }
+    if (batch.length > 0) {
       yield batch
-      batch = []
     }
   }
-  if (batch.length > 0) {
-    yield batch
-  }
+
+  return { totalHosts, generateBatch }
 }
 
 function generateIpFromOffset(segmentIp, offset) {
