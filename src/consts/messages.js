@@ -1,3 +1,4 @@
+import { numberFormatter } from '../utils/number-formatter.js'
 import colors from 'picocolors'
 
 export const messages = {
@@ -15,10 +16,13 @@ export const messages = {
     validateMessage: 'Please insert netmask in range 1-32'
   },
   canceled: 'Operation Canceled',
-  spinner: {
-    start: `${colors.cyan('Scanning network')}`,
+  progress: {
+    start: (ipComplete, totalHosts) =>
+      `${colors.cyan(`Scanning network: ${numberFormatter.format(ipComplete)} of ${numberFormatter.format(totalHosts)}`)}`,
     end: `${colors.cyan('Finalice scanning')}`
   },
+  confirmScan: totalHosts =>
+    `Do you want to continue?, A total of ${numberFormatter.format(totalHosts)} hosts will be scanned.`,
   note: {
     title: `${colors.cyan('IPs Available')}`,
     content: IPs => IPs.join('\n')
