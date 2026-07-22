@@ -1,4 +1,4 @@
-import { intro, text, isCancel, cancel, spinner, note, outro } from '@clack/prompts'
+import { intro, text, isCancel, cancel, note, outro, progress, confirm } from '@clack/prompts'
 import { messages } from './consts/messages.js'
 import { pingIP } from './services/ping.js'
 import { generateIPs } from './services/generate-ips.js'
@@ -37,20 +37,47 @@ if (isCancel(netmask)) {
   process.exit(0)
 }
 
-const IPs = generateIPs(segmentIp, netmask)
+const { totalHosts, generateBatch } = generateIPs(segmentIp, netmask)
 const IPsAvailable = []
 
-const sp = spinner()
-sp.start(messages.spinner.start)
+const confirmScan = await confirm({
+  message: messages.confirmScan(totalHosts)
+})
 
-for (const batch of IPs) {
-  const responses = await Promise.all(batch.map(pingIP))
+if (!confirmScan || isCancel(confirmScan)) {
+  cancel(messages.canceled)
+  process.exit(0)
+}
+
+const prog = progress({
+  indicator: 'timer',
+  style: 'block',
+  max: totalHosts,
+  cancelMessage: messages.canceled
+})
+
+let ipComplete = 0
+
+prog.start(messages.progress.start(ipComplete, totalHosts))
+
+for (const batch of generateBatch()) {
+  const responses = await Promise.all(
+    batch.map(ip => {
+      const promise = pingIP(ip)
+      promise.finally(() => {
+        prog.advance()
+        ipComplete++
+        prog.message(messages.progress.start(ipComplete, totalHosts))
+      })
+      return promise
+    })
+  )
   responses.forEach(response =>
     typeof response !== 'undefined' ? IPsAvailable.push(response.ip) : null
   )
 }
 
-sp.stop(messages.spinner.end)
+prog.stop(messages.progress.end)
 
 note(messages.note.content(IPsAvailable), messages.note.title)
 
