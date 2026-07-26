@@ -22,7 +22,7 @@ export const messages = {
     end: `${colors.cyan('Finalice scanning')}`
   },
   confirmScan: totalHosts =>
-    `Do you want to continue?, A total of ${numberFormatter.format(totalHosts)} hosts will be scanned.`,
+    `${colors.cyan(`Do you want to continue?, A total of ${numberFormatter.format(totalHosts)} hosts will be scanned.`)}`,
   note: {
     title: `${colors.cyan('IPs Available')}`,
     content: IPs => IPs.join('\n')
