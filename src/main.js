@@ -79,6 +79,10 @@ for (const batch of generateBatch()) {
 
 prog.stop(messages.progress.end)
 
-note(messages.note.content(IPsAvailable), messages.note.title)
+if (IPsAvailable.length > 0) {
+  note(messages.note.content(IPsAvailable), messages.note.title)
+} else {
+  note(messages.note.noContent, messages.note.title)
+}
 
 outro(messages.outro)

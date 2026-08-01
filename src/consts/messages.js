@@ -25,7 +25,8 @@ export const messages = {
     `${colors.cyan(`Do you want to continue?, A total of ${numberFormatter.format(totalHosts)} hosts will be scanned.`)}`,
   note: {
     title: `${colors.cyan('IPs Available')}`,
-    content: IPs => IPs.join('\n')
+    content: IPs => IPs.join('\n'),
+    noContent: 'No active IPs have been detected in the segment'
   },
   outro: `${colors.bgWhite(colors.black(' Thanks for using '))}`
 }
