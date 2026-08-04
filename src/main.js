@@ -1,9 +1,25 @@
-import { intro, text, isCancel, cancel, note, outro, progress, confirm } from '@clack/prompts'
+import {
+  intro,
+  text,
+  isCancel,
+  cancel,
+  note,
+  outro,
+  progress,
+  confirm,
+  path,
+  log
+} from '@clack/prompts'
 import { messages } from './consts/messages.js'
 import { pingIP } from './services/ping.js'
 import { generateIPs } from './services/generate-ips.js'
 import { isIPv4 } from 'node:net'
 import { MAX_NETMASK, MIN_NETMASK } from './consts/netmask.js'
+import { FILE_NAME_REGEX } from './consts/file-name.js'
+import { homedir } from 'node:os'
+import { generateCSV } from './utils/generate-csv.js'
+import { exportCSV } from './services/export-csv.js'
+import { fileExists } from './services/file-exists.js'
 
 intro(messages.intro)
 
@@ -79,6 +95,82 @@ for (const batch of generateBatch()) {
 
 prog.stop(messages.progress.end)
 
-note(messages.note.content(IPsAvailable), messages.note.title)
+if (IPsAvailable.length > 0) {
+  note(messages.note.content(IPsAvailable), messages.note.title)
+} else {
+  note(messages.note.noContent, messages.note.title)
+}
+
+const confirmExport = await confirm({
+  message:
+    IPsAvailable.length > 0
+      ? messages.exportFile.confirmExport
+      : messages.exportFile.confirmEmptyExport
+})
+
+if (isCancel(confirmExport)) {
+  cancel(messages.canceled)
+  process.exit(0)
+}
+
+if (confirmExport) {
+  const directoryToExport = await path({
+    message: messages.exportFile.directoryMessage,
+    directory: true,
+    root: homedir()
+  })
+
+  if (isCancel(directoryToExport)) {
+    cancel(messages.canceled)
+    process.exit(0)
+  }
+
+  const fileName = await text({
+    message: messages.exportFile.fileName.message,
+    placeholder: messages.exportFile.fileName.placeholder,
+    validate: value => {
+      if (!value) {
+        return messages.exportFile.fileName.validateMessage.required
+      }
+
+      if (!value.trim()) {
+        return messages.exportFile.fileName.validateMessage.empty
+      }
+
+      if (!FILE_NAME_REGEX.test(value)) {
+        return messages.exportFile.fileName.validateMessage.format
+      }
+    }
+  })
+
+  if (isCancel(fileName)) {
+    cancel(messages.canceled)
+    process.exit(0)
+  }
+
+  const existingFile = await fileExists(directoryToExport, fileName)
+
+  if (existingFile.exists) {
+    const confirmOverwrite = await confirm({
+      message: messages.exportFile.overwriteConfirm(existingFile.pathFile),
+      initialValue: false
+    })
+
+    if (isCancel(confirmOverwrite) || !confirmOverwrite) {
+      cancel(messages.canceled)
+      process.exit(0)
+    }
+  }
+
+  const csvContent = generateCSV(['Active IPs'], IPsAvailable)
+
+  const result = await exportCSV(directoryToExport, fileName, csvContent)
+
+  if (result.success) {
+    log.success(messages.exportFile.successExport(result.filePath))
+  } else {
+    log.error(messages.exportFile.errorExport)
+  }
+}
 
 outro(messages.outro)
