@@ -28,5 +28,23 @@ export const messages = {
     content: IPs => IPs.join('\n'),
     noContent: 'No active IPs have been detected in the segment'
   },
+  exportFile: {
+    confirmExport: colors.cyan('Do you want export data to CSV file?'),
+    confirmEmptyExport: colors.cyan('No active IPs found, export empty CSV anyway?'),
+    directoryMessage: colors.cyan('Select path to export file'),
+    fileName: {
+      message: colors.cyan('Enter a CSV file name'),
+      placeholder: 'Example: ActiveIPs.csv',
+      validateMessage: {
+        required: 'Please enter a file name',
+        empty: 'File name cannot be empty',
+        format: 'Use only letters and end with .csv'
+      }
+    },
+    overwriteConfirm: filePath =>
+      colors.cyan(`The file ${colors.white(filePath)} already exists. Overwrite it?`),
+    successExport: filePath => `${colors.cyan('File is exported in')} ${colors.white(filePath)}`,
+    errorExport: 'Error on export file'
+  },
   outro: `${colors.bgWhite(colors.black(' Thanks for using '))}`
 }
