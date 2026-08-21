@@ -6,7 +6,6 @@
   "type": "module",
   "scripts": {
     "start": "node src/main.js",
-    "commit": "commit-easy",
     "lint:fix": "eslint --fix",
     "lint:check": "eslint",
     "format:check": "prettier . --check",
@@ -20,7 +19,6 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "commit-easy": "1.0.4",
     "eslint": "^10.6.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.6",
