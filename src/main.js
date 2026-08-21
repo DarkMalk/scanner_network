@@ -88,9 +88,7 @@ for (const batch of generateBatch()) {
       return promise
     })
   )
-  responses.forEach(response =>
-    typeof response !== 'undefined' ? IPsAvailable.push(response.ip) : null
-  )
+  responses.forEach(response => (response.success === true ? IPsAvailable.push(response.ip) : null))
 }
 
 prog.stop(messages.progress.end)
