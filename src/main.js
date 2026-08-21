@@ -12,7 +12,7 @@ import {
 } from '@clack/prompts'
 import { messages } from './consts/messages.js'
 import { pingIP } from './services/ping.js'
-import { generateIPs } from './services/generate-ips.js'
+import { generateIPs } from './utils/generate-ips.js'
 import { isIPv4 } from 'node:net'
 import { MAX_NETMASK, MIN_NETMASK } from './consts/netmask.js'
 import { FILE_NAME_REGEX } from './consts/file-name.js'
