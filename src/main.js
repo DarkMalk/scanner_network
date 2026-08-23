@@ -5,10 +5,10 @@ import {
   cancel,
   note,
   outro,
-  progress,
   confirm,
   path,
-  log
+  log,
+  tasks
 } from '@clack/prompts'
 import { messages } from './consts/messages.js'
 import { pingIP } from './services/ping.js'
@@ -20,6 +20,7 @@ import { homedir } from 'node:os'
 import { generateCSV } from './utils/generate-csv.js'
 import { exportCSV } from './services/export-csv.js'
 import { fileExists } from './services/file-exists.js'
+import { getMACAddresses } from './services/get-mac-addresses.js'
 
 intro(messages.intro)
 
@@ -55,6 +56,7 @@ if (isCancel(netmask)) {
 
 const { totalHosts, generateBatch } = generateIPs(segmentIp, netmask)
 const IPsAvailable = []
+const MACAddresses = []
 
 const confirmScan = await confirm({
   message: messages.confirmScan(totalHosts)
@@ -65,36 +67,62 @@ if (!confirmScan || isCancel(confirmScan)) {
   process.exit(0)
 }
 
-const prog = progress({
-  indicator: 'timer',
-  style: 'block',
-  max: totalHosts,
-  cancelMessage: messages.canceled
-})
+await tasks([
+  {
+    title: messages.tasks.discoveryHosts.start(0, totalHosts),
+    task: async message => {
+      let ipComplete = 0
 
-let ipComplete = 0
+      for (const batch of generateBatch()) {
+        const responses = await Promise.all(
+          batch.map(ip => {
+            const promise = pingIP(ip)
+            promise.finally(() => {
+              ipComplete++
+              message(messages.tasks.discoveryHosts.start(ipComplete, totalHosts))
+            })
+            return promise
+          })
+        )
+        responses.forEach(response => response.success && IPsAvailable.push(response.ip))
+      }
 
-prog.start(messages.progress.start(ipComplete, totalHosts))
+      return messages.tasks.discoveryHosts.end(IPsAvailable.length)
+    }
+  },
+  {
+    title: messages.tasks.discoveryMAC.start(0, IPsAvailable.length),
+    task: async message => {
+      let macComplete = 0
 
-for (const batch of generateBatch()) {
-  const responses = await Promise.all(
-    batch.map(ip => {
-      const promise = pingIP(ip)
-      promise.finally(() => {
-        prog.advance()
-        ipComplete++
-        prog.message(messages.progress.start(ipComplete, totalHosts))
-      })
-      return promise
-    })
-  )
-  responses.forEach(response => (response.success === true ? IPsAvailable.push(response.ip) : null))
-}
+      const responses = await Promise.all(
+        IPsAvailable.map(ip => {
+          const promise = getMACAddresses(ip)
+          promise.finally(() => {
+            macComplete++
+            message(messages.tasks.discoveryMAC.start(macComplete, IPsAvailable.length))
+          })
 
-prog.stop(messages.progress.end)
+          return promise
+        })
+      )
+
+      responses.forEach(
+        res => res.success && MACAddresses.push({ ip: res.data.ip, mac: res.data.mac })
+      )
+
+      return messages.tasks.discoveryMAC.end(
+        MACAddresses.filter(value => value.mac !== 'N/A').length
+      )
+    }
+  }
+])
 
 if (IPsAvailable.length > 0) {
-  note(messages.note.content(IPsAvailable), messages.note.title)
+  note(
+    messages.note.content(MACAddresses.map(val => `${val.ip} - ${val.mac}`)),
+    messages.note.title
+  )
 } else {
   note(messages.note.noContent, messages.note.title)
 }
@@ -160,7 +188,10 @@ if (confirmExport) {
     }
   }
 
-  const csvContent = generateCSV(['Active IPs'], IPsAvailable)
+  const csvContent = generateCSV(
+    ['Active IPs', 'MAC'],
+    MACAddresses.flatMap(value => Object.values(value))
+  )
 
   const result = await exportCSV(directoryToExport, fileName, csvContent)
 

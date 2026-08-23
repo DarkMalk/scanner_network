@@ -16,11 +16,6 @@ export const messages = {
     validateMessage: 'Please insert netmask in range 1-32'
   },
   canceled: 'Operation Canceled',
-  progress: {
-    start: (ipComplete, totalHosts) =>
-      `${colors.cyan(`Scanning network: ${numberFormatter.format(ipComplete)} of ${numberFormatter.format(totalHosts)}`)}`,
-    end: `${colors.cyan('Finalice scanning')}`
-  },
   confirmScan: totalHosts =>
     `${colors.cyan(`Do you want to continue?, A total of ${numberFormatter.format(totalHosts)} hosts will be scanned.`)}`,
   note: {
@@ -45,6 +40,22 @@ export const messages = {
       colors.cyan(`The file ${colors.white(filePath)} already exists. Overwrite it?`),
     successExport: filePath => `${colors.cyan('File is exported in')} ${colors.white(filePath)}`,
     errorExport: 'Error on export file'
+  },
+  tasks: {
+    discoveryHosts: {
+      start: (ipComplete, totalHosts) =>
+        colors.cyan(
+          `Scanning network: ${numberFormatter.format(ipComplete)} of ${numberFormatter.format(totalHosts)}`
+        ),
+      end: total => colors.cyan(`Discovered ${total} IPs available in LAN`)
+    },
+    discoveryMAC: {
+      start: (macComplete, totalHosts) =>
+        colors.cyan(
+          `Scanning Mac Addresses: ${numberFormatter.format(macComplete)} of ${numberFormatter.format(totalHosts)}`
+        ),
+      end: total => colors.cyan(`Discovered ${total} MACs`)
+    }
   },
   outro: `${colors.bgWhite(colors.black(' Thanks for using '))}`
 }
