@@ -55,6 +55,13 @@ export const messages = {
           `Scanning Mac Addresses: ${numberFormatter.format(macComplete)} of ${numberFormatter.format(totalHosts)}`
         ),
       end: total => colors.cyan(`Discovered ${total} MACs`)
+    },
+    discoveryHostname: {
+      start: (complete, total) =>
+        colors.cyan(
+          `Scanning Hostnames: ${numberFormatter.format(complete)} of ${numberFormatter.format(total)}`
+        ),
+      end: total => colors.cyan(`Discovered ${total} Hostnames`)
     }
   },
   outro: `${colors.bgWhite(colors.black(' Thanks for using '))}`
