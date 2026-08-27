@@ -21,6 +21,8 @@ import { generateCSV } from './utils/generate-csv.js'
 import { exportCSV } from './services/export-csv.js'
 import { fileExists } from './services/file-exists.js'
 import { getMACAddresses } from './services/get-mac-addresses.js'
+import { getHostname } from './services/get-hostname.js'
+import { generateHostnameBatches } from './utils/generate-hostname-batches.js'
 
 intro(messages.intro)
 
@@ -56,7 +58,6 @@ if (isCancel(netmask)) {
 
 const { totalHosts, generateBatch } = generateIPs(segmentIp, netmask)
 const IPsAvailable = []
-const MACAddresses = []
 
 const confirmScan = await confirm({
   message: messages.confirmScan(totalHosts)
@@ -84,7 +85,10 @@ await tasks([
             return promise
           })
         )
-        responses.forEach(response => response.success && IPsAvailable.push(response.ip))
+        responses.forEach(
+          response =>
+            response.success && IPsAvailable.push({ ip: response.ip, mac: null, hostname: null })
+        )
       }
 
       return messages.tasks.discoveryHosts.end(IPsAvailable.length)
@@ -96,8 +100,8 @@ await tasks([
       let macComplete = 0
 
       const responses = await Promise.all(
-        IPsAvailable.map(ip => {
-          const promise = getMACAddresses(ip)
+        IPsAvailable.map(host => {
+          const promise = getMACAddresses(host.ip)
           promise.finally(() => {
             macComplete++
             message(messages.tasks.discoveryMAC.start(macComplete, IPsAvailable.length))
@@ -108,11 +112,42 @@ await tasks([
       )
 
       responses.forEach(
-        res => res.success && MACAddresses.push({ ip: res.data.ip, mac: res.data.mac })
+        res =>
+          res.success &&
+          IPsAvailable.forEach((host, index) => {
+            if (host.ip === res.data.ip) {
+              IPsAvailable[index] = { ...IPsAvailable[index], mac: res.data.mac }
+            }
+          })
       )
 
       return messages.tasks.discoveryMAC.end(
-        MACAddresses.filter(value => value.mac !== 'N/A').length
+        IPsAvailable.filter(value => value.mac !== 'N/A').length
+      )
+    }
+  },
+  {
+    title: messages.tasks.discoveryHostname.start(0, IPsAvailable.length),
+    task: async message => {
+      let complete = 0
+
+      for (const batch of generateHostnameBatches(IPsAvailable)) {
+        const responses = await Promise.all(batch.map(host => getHostname(host.ip)))
+
+        responses.forEach(res => {
+          if (res.success) {
+            const index = IPsAvailable.findIndex(h => h.ip === res.data.ip)
+            if (index !== -1) {
+              IPsAvailable[index].hostname = res.data.hostname
+            }
+          }
+          complete++
+          message(messages.tasks.discoveryHostname.start(complete, IPsAvailable.length))
+        })
+      }
+
+      return messages.tasks.discoveryHostname.end(
+        IPsAvailable.filter(h => h.hostname !== null).length
       )
     }
   }
@@ -120,7 +155,9 @@ await tasks([
 
 if (IPsAvailable.length > 0) {
   note(
-    messages.note.content(MACAddresses.map(val => `${val.ip} - ${val.mac}`)),
+    messages.note.content(
+      IPsAvailable.map(val => `${val.ip} - ${val.mac} - ${val.hostname ?? 'N/A'}`)
+    ),
     messages.note.title
   )
 } else {
@@ -189,8 +226,8 @@ if (confirmExport) {
   }
 
   const csvContent = generateCSV(
-    ['Active IPs', 'MAC'],
-    MACAddresses.flatMap(value => Object.values(value))
+    ['Active IPs', 'MAC', 'Hostname'],
+    IPsAvailable.flatMap(value => Object.values(value))
   )
 
   const result = await exportCSV(directoryToExport, fileName, csvContent)
